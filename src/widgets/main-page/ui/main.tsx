@@ -28,7 +28,7 @@ export const Main = () => {
         }}
       >
         <Typography variant="h1" mb={5} mt={5}>Main</Typography>
-        <Button variant="contained" onClick={handleOpen}>
+        <Button variant="contained" color="success" onClick={handleOpen}>
           Создать
         </Button>
       </Box>

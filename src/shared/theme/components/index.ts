@@ -1,10 +1,12 @@
 import { ThemeOptions } from '@mui/material'
 
 import { buttonsTheme } from './buttons'
+import { inputsTheme } from './inputs'
 
 import.meta.env.BASE_URL
 export const components: ThemeOptions['components'] = {
   ...buttonsTheme,
+  ...inputsTheme,
   MuiChip: {
     styleOverrides: {
       root: {
