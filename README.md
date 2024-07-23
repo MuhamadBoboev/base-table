@@ -1,3 +1,33 @@
+## Description
+This project is designed for creating, editing, and managing posts. It provides a user-friendly interface for interacting with posts and their metadata.
+
+## Libraries and Technologies Used
+- **React**: A library for building user interfaces.
+- **Vite**: A tool for fast frontend build.
+- **TypeScript**: A superset of JavaScript that adds static typing.
+- **Material-UI**: Components for React implementing Material Design.
+- **React Query**: State and server data management.
+- **Zustand**: A lightweight state management library.
+- **React Hook Form**: Form handling in React.
+- **Yup**: Schema validation.
+- **react-hot-toast**: Notifications in React.
+
+## Project Tasks
+- Creating, editing, and deleting posts.
+- Managing application state.
+- Handling and validating forms.
+- Managing data fetched from the server.
+- Creating a modern and user-friendly interface.
+- Displaying notifications to users.
+- Fast build and development of the application.
+- Ensuring static typing and improving code quality.
+
+## Running the Project
+- Start the JSON server:
+  ```sh
+  npx json-server --watch db.json --port 3000
+  
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
