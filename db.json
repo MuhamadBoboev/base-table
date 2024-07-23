@@ -1,44 +1,28 @@
 {
   "posts": [
     {
-      "id": 1,
-      "title": "Exploring the Universe",
-      "author": "Alice Johnson",
-      "views": 1023,
-      "likes": 145,
-      "comments": 23
+      "id": "fca4",
+      "title": "1213 121213 121213 121213 1212",
+      "author": "212313 12 3121213 12",
+      "views": 0,
+      "likes": 0,
+      "comments": 0
     },
     {
-      "id": 2,
-      "title": "The Art of Cooking",
-      "author": "Bob Smith",
-      "views": 874,
-      "likes": 120,
-      "comments": 15
+      "id": "af4d",
+      "title": "asd",
+      "author": "asd",
+      "views": 0,
+      "likes": 0,
+      "comments": 0
     },
     {
-      "id": 3,
-      "title": "Advancements in AI",
-      "author": "Charlie Davis",
-      "views": 1312,
-      "likes": 180,
-      "comments": 30
-    },
-    {
-      "id": 4,
-      "title": "Travel Guide: Japan",
-      "author": "Diana Moore",
-      "views": 764,
-      "likes": 95,
-      "comments": 10
-    },
-    {
-      "id": 5,
-      "title": "Understanding Quantum Physics",
-      "author": "Evan Wilson",
-      "views": 540,
-      "likes": 65,
-      "comments": 7
+      "id": "9873",
+      "title": "asda",
+      "author": "asdad",
+      "views": 0,
+      "likes": 0,
+      "comments": 0
     }
   ]
 }

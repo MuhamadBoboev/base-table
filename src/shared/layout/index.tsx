@@ -1,4 +1,4 @@
-import { Box } from "@mui/material"
+import { Box, Button, Link } from "@mui/material"
 import { PropsWithChildren } from "react"
 
 export const Layout = ({children}: PropsWithChildren) => {
@@ -27,6 +27,21 @@ export const Layout = ({children}: PropsWithChildren) => {
                     >
                         {children}
                     <Box/>
+                    <Box textAlign={'center'} mt={5}>
+                    
+                    <Button
+                        LinkComponent={Link}
+                        href="https://github.com/MuhamadBoboev"
+                        target="_blank"
+                        color="info"
+                        sx={{
+                            textDecoration: 'none',
+                            color: 'white'
+                        }}
+                        >
+                        Developer by Boboev M
+                        </Button>
+                    </Box>
                 </Box>
             </Box>
         </Box>
