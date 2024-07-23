@@ -2,37 +2,59 @@ import { Box, Button, Modal, TextField, Typography, Fade, Backdrop } from "@mui/
 import { useMutation } from "react-query";
 import { postQuery, queryClient } from "@shared/api";
 import toast from "react-hot-toast";
-import { Field, Form, Formik, ErrorMessage } from "formik";
+import { useForm, Controller, SubmitHandler } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
-
-interface CreatePostModalProps {
-  open: boolean;
-  handleClose: () => void;
-}
+import { useModalStore } from "../model/modal-store";
 
 const validationSchema = Yup.object({
-  title: Yup.string().required("Title is required"),
-  author: Yup.string().required("Author is required"),
-  views: Yup.number().required("Views are required").min(0, "Views cannot be negative"),
-  likes: Yup.number().required("Likes are required").min(0, "Likes cannot be negative"),
-  comments: Yup.number().required("Comments are required").min(0, "Comments cannot be negative"),
+  title: Yup.string().required("Заголовок обязателен").max(30, "Заголовок не должен превышать 30 символов"),
+  author: Yup.string().required("Автор обязателен").max(20, "Имя автора не должно превышать 20 символов"),
+  views: Yup.number().required("Количество просмотров обязательно").min(0, "Количество просмотров не может быть отрицательным"),
+  likes: Yup.number().required("Количество лайков обязательно").min(0, "Количество лайков не может быть отрицательным"),
+  comments: Yup.number().required("Количество комментариев обязательно").min(0, "Количество комментариев не может быть отрицательным"),
 });
-
-export const CreatePostModal: React.FC<CreatePostModalProps> = ({ open, handleClose }) => {
+interface FormData {
+  title: string;
+  author: string
+  views: number 
+  likes: number 
+  comments: number
+}
+export const CreatePostModal = () => {
   const mutation = useMutation(postQuery('posts'), {
     onSuccess: () => {
-      toast.success('Post created');
+      toast.success('Пост успешно создан');
       queryClient.invalidateQueries('posts');
     },
     onError: () => {
-      toast.error('Error');
+      toast.error('Ошибка при создании поста');
     }
   });
 
+  const { isOpen, closeModal } = useModalStore((state) => ({
+    isOpen: state.isOpen,
+    openModal: state.openModal,
+    closeModal: state.closeModal
+  }));
+
+  const { control, handleSubmit, reset, watch, formState: { errors, isValid, isSubmitting } } = useForm({
+    resolver: yupResolver(validationSchema),
+    mode: "onChange"
+  });
+
+  watch(["title", "author", "views", "likes", "comments"]);
+
+  const onSubmit: SubmitHandler<FormData> = (data) => {
+    mutation.mutate(data);
+    reset({ title: "", author: "", views: 0, likes: 0, comments: 0 });
+    closeModal();
+  };
+
   return (
     <Modal
-      open={open}
-      onClose={handleClose}
+      open={isOpen}
+      onClose={closeModal}
       closeAfterTransition
       BackdropComponent={Backdrop}
       BackdropProps={{
@@ -41,7 +63,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ open, handleCl
       aria-labelledby="modal-modal-title"
       aria-describedby="modal-modal-description"
     >
-      <Fade in={open}>
+      <Fade in={isOpen}>
         <Box sx={{
           position: 'absolute',
           top: '50%',
@@ -54,87 +76,107 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ open, handleCl
           p: 4,
           outline: 'none',
         }}>
-          <Typography id="modal-modal-title" variant="h6" component="h2" gutterBottom>
-            Create New Post
+          <Typography id="modal-modal-title" variant="h4" component="h2" gutterBottom mb={6}>
+            Новый пост
           </Typography>
-          <Formik
-            initialValues={{ title: '', author: '', views: 0, likes: 0, comments: 0 }}
-            validationSchema={validationSchema}
-            onSubmit={(values, { setSubmitting }) => {
-              mutation.mutate(values);
-              setSubmitting(false);
-              handleClose();
-            }}
-          >
-            {({ isSubmitting, isValid, dirty, touched, errors }) => (
-              <Form>
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                  <Field 
-                    as={TextField} 
-                    name="title" 
-                    label="Title" 
-                    variant="outlined" 
-                    fullWidth 
-                    error={touched.title && !!errors.title}
-                    helperText={<ErrorMessage name="title" />}
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+              <Controller
+                name="title"
+                control={control}
+                defaultValue=""
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    label="Заголовок"
+                    variant="outlined"
+                    fullWidth
+                    error={!!errors.title}
+                    helperText={errors.title ? errors.title.message : ""}
+                    inputProps={{ maxLength: 30 }}
                   />
-                  <Field 
-                    as={TextField} 
-                    name="author" 
-                    label="Author" 
-                    variant="outlined" 
-                    fullWidth 
-                    error={touched.author && !!errors.author}
-                    helperText={<ErrorMessage name="author" />}
+                )}
+              />
+              <Controller
+                name="author"
+                control={control}
+                defaultValue=""
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    label="Автор"
+                    variant="outlined"
+                    fullWidth
+                    error={!!errors.author}
+                    helperText={errors.author ? errors.author.message : ""}
+                    inputProps={{ maxLength: 20 }}
                   />
-                  <Field 
-                    as={TextField} 
-                    name="views" 
-                    label="Views" 
-                    variant="outlined" 
-                    fullWidth 
-                    type="number" 
-                    error={touched.views && !!errors.views}
-                    helperText={<ErrorMessage name="views" />}
+                )}
+              />
+              <Controller
+                name="views"
+                control={control}
+                defaultValue={0}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    label="Просмотры"
+                    variant="outlined"
+                    fullWidth
+                    type="number"
+                    error={!!errors.views}
+                    helperText={errors.views ? errors.views.message : ""}
                   />
-                  <Field 
-                    as={TextField} 
-                    name="likes" 
-                    label="Likes" 
-                    variant="outlined" 
-                    fullWidth 
-                    type="number" 
-                    error={touched.likes && !!errors.likes}
-                    helperText={<ErrorMessage name="likes" />}
+                )}
+              />
+              <Controller
+                name="likes"
+                control={control}
+                defaultValue={0}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    label="Лайки"
+                    variant="outlined"
+                    fullWidth
+                    type="number"
+                    error={!!errors.likes}
+                    helperText={errors.likes ? errors.likes.message : ""}
                   />
-                  <Field 
-                    as={TextField} 
-                    name="comments" 
-                    label="Comments" 
-                    variant="outlined" 
-                    fullWidth 
-                    type="number" 
-                    error={touched.comments && !!errors.comments}
-                    helperText={<ErrorMessage name="comments" />}
+                )}
+              />
+              <Controller
+                name="comments"
+                control={control}
+                defaultValue={0}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    label="Комментарии"
+                    variant="outlined"
+                    fullWidth
+                    type="number"
+                    error={!!errors.comments}
+                    helperText={errors.comments ? errors.comments.message : ""}
                   />
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2, gridGap: 10 }}>
-                    <Button onClick={handleClose} fullWidth color="error" variant="outlined">
-                      Cancel
-                    </Button>
-                    <Button 
-                      type="submit" 
-                      fullWidth 
-                      color="success" 
-                      variant="contained" 
-                      disabled={isSubmitting || !isValid || !dirty}
-                    >
-                      Submit
-                    </Button>
-                  </Box>
-                </Box>
-              </Form>
-            )}
-          </Formik>
+                )}
+              />
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2, gridGap: 10 }}>
+                <Button onClick={closeModal} fullWidth color="error" variant="outlined">
+                  Отмена
+                </Button>
+                <Button
+                  type="submit"
+                  fullWidth
+                  color="success"
+                  variant="contained"
+                  disabled={isSubmitting || !isValid}
+                >
+                  Отправить
+                </Button>
+              </Box>
+            </Box>
+          </form>
         </Box>
       </Fade>
     </Modal>

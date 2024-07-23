@@ -1,38 +1,42 @@
-import React from 'react';
-import Paper from '@mui/material/Paper';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TablePagination from '@mui/material/TablePagination';
-import TableRow from '@mui/material/TableRow';
+import React, { useState } from 'react';
+import { Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TablePagination, CircularProgress, Alert, Box } from '@mui/material';
+import { useQuery, useMutation } from 'react-query';
+import { deleteQuery, getQuery, queryClient } from "@shared/api";
+import toast from "react-hot-toast";
 import { IItem } from '../model';
 
 interface Column {
-  id:  'id' |'title' | 'author' | 'views' | 'likes' | 'comments';
+  id: 'id' | 'title' | 'author' | 'views' | 'likes' | 'comments' | 'actions';
   label: string;
   minWidth?: number;
   align?: 'right';
   format?: (value: number) => string;
 }
 
-const columns: readonly Column[] = [
-  { id: 'id', label: 'Id', minWidth: 20 },
-  { id: 'title', label: 'Title', minWidth: 170 },
-  { id: 'author', label: 'Author', minWidth: 100 },
-  { id: 'views', label: 'Views', minWidth: 100, align: 'right' },
-  { id: 'likes', label: 'Likes', minWidth: 100, align: 'right' },
-  { id: 'comments', label: 'Comments', minWidth: 100, align: 'right' }
+const allColumns: readonly Column[] = [
+  { id: 'id', label: 'ID', minWidth: 20 },
+  { id: 'title', label: 'Заголовок', minWidth: 170 },
+  { id: 'author', label: 'Автор', minWidth: 100 },
+  { id: 'views', label: 'Просмотры', minWidth: 100, align: 'right' },
+  { id: 'likes', label: 'Лайки', minWidth: 100, align: 'right' },
+  { id: 'comments', label: 'Комментарии', minWidth: 100, align: 'right' },
+  { id: 'actions', label: 'Действия', minWidth: 100, align: 'right' },
 ];
 
-interface Props {
-  data: IItem[]
-}
+export const MainTable: React.FC = () => {
+  const { data, isError, isLoading } = useQuery('posts', getQuery<IItem[]>('posts'));
+  const deleteMutation = useMutation((id: number) => deleteQuery(`posts/${id}`), {
+    onSuccess: () => {
+      queryClient.invalidateQueries('posts');
+      toast.success("Пост успешно удален");
+    },
+    onError: () => {
+      toast.error("Не удалось удалить пост");
+    }
+  });
 
-export const MainTable  = ({ data }: Props) => {
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(10);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [page, setPage] = useState(0);
 
   const handleChangePage = (_event: unknown, newPage: number) => {
     setPage(newPage);
@@ -43,13 +47,41 @@ export const MainTable  = ({ data }: Props) => {
     setPage(0);
   };
 
+  const handleDelete = (id: number) => {
+    deleteMutation.mutate(id);
+  };
+
+  if (isLoading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (isError) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <Alert severity="error">Ошибка загрузки данных</Alert>
+      </Box>
+    );
+  }
+
+  if (!data) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <Alert severity="warning">Данные отсутствуют</Alert>
+      </Box>
+    );
+  }
+
   return (
-    <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-      <TableContainer sx={{ maxHeight: 440 }}>
+    <Paper sx={{ width: '100%', overflow: 'hidden', padding: '16px' }}>
+      <TableContainer>
         <Table stickyHeader aria-label="sticky table">
           <TableHead>
             <TableRow>
-              {columns.map((column) => (
+              {allColumns.map(column => (
                 <TableCell
                   key={column.id}
                   align={column.align}
@@ -61,25 +93,25 @@ export const MainTable  = ({ data }: Props) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {data.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-              return (
-                <TableRow hover role="checkbox" tabIndex={-1} key={row.id}>
-                  {columns.map((column) => {
-                    const value = row[column.id];
-                    return (
-                      <TableCell key={column.id} align={column.align}>
-                        {value}
-                      </TableCell>
-                    );
-                  })}
-                </TableRow>
-              );
-            })}
+            {data.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
+              <TableRow hover role="checkbox" tabIndex={-1} key={row.id}>
+                {allColumns.map((column) => {
+                  const value = column.id === 'actions' 
+                    ? <Button variant="contained" color="error" onClick={() => handleDelete(row.id)}>Удалить</Button>
+                    : row[column.id];
+                  return (
+                    <TableCell key={column.id} align={column.align}>
+                      {value}
+                    </TableCell>
+                  );
+                })}
+              </TableRow>
+            ))}
           </TableBody>
         </Table>
       </TableContainer>
       <TablePagination
-        rowsPerPageOptions={[10, 25, 100]}
+        rowsPerPageOptions={[5, 10, 25, 100]}
         component="div"
         count={data.length}
         rowsPerPage={rowsPerPage}
