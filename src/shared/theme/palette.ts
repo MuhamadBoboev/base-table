@@ -7,7 +7,7 @@ export const colors: ThemeOptions['palette'] = {
     main: '#39b980',
   },
   secondary: {
-    main: '#39b980',
+    main: '#000',
   },
   success: {
     main: '#0E9F6E',

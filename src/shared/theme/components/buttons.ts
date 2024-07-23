@@ -9,7 +9,6 @@ export const buttonsTheme: ThemeOptions['components'] = {
         fontWeight: 500,
         textTransform: 'none',
         borderRadius: 48,
-        color: 'white',
         boxShadow: 'none',
         '&:hover': {
           boxShadow: 'none',
@@ -102,46 +101,5 @@ export const buttonsTheme: ThemeOptions['components'] = {
         },
       }
     ],
-  },
-  // Remove the MuiLoadingButton property
-  MuiLink: {
-    styleOverrides: {
-      root: {
-        color: `${palette.text.primary} !important`,
-        textDecoration: 'none',
-        '&:hover': {
-          color: `${palette.primary.main} !important`,
-        },
-      },
-    },
-  },
-  MuiCard: {
-    styleOverrides: {
-      root: {
-        borderRadius: 12,
-        height: '100%',
-        maxWidth: '100% !important',
-      },
-    },
-  },
-  MuiCardMedia: {
-    styleOverrides: {
-      root: {
-        padding: '10px',
-        objectFit: 'contain',
-      },
-    },
-  },
-  MuiCardContent: {
-    styleOverrides: {
-      root: {
-        padding: '12px 16px', 
-        borderTop: `1px solid ${palette.grey[500]}`,
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '4px',
-        boxSizing: 'border-box',
-      },
-    },
   },
 }
