@@ -1,6 +1,10 @@
 ## Description
 This project is designed for creating, editing, and managing posts. It provides a user-friendly interface for interacting with posts and their metadata.
 
+![Description of Image](public/main/image_1.png)
+![Description of Image](public/main/image_2.png)
+![Description of Image](public/main/image_3.png)
+
 ## Libraries and Technologies Used
 - **React**: A library for building user interfaces.
 - **Vite**: A tool for fast frontend build.
